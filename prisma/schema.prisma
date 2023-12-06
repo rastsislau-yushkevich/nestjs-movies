@@ -1,0 +1,69 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RoleTypes {
+  Admin
+  SuperAdmin
+  User
+}
+
+enum UserPermissions {
+  All
+  GetUsers
+  GetMe
+  CreateMovie
+  CreateCategory
+}
+
+model Role {
+  id          Int               @id @unique @default(autoincrement())
+  type        RoleTypes
+  permissions UserPermissions[]
+  users       User[]
+}
+
+model User {
+  id             Int      @id @unique @default(autoincrement())
+  email          String   @unique
+  hashedPassword String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  Role           Role?    @relation(fields: [roleId], references: [id])
+  roleId         Int?
+
+  movies Movie[]
+
+  @@map("users")
+}
+
+model Movie {
+  id          Int      @id @unique @default(autoincrement())
+  title       String
+  description String
+  rating      Float
+  releaseDate DateTime
+  director    String
+  cover       String
+
+  users User[]
+
+  @@map("movies")
+}
+
+// model MoviesOnUsers {
+//   movieId Int
+//   userId  Int
+//   movie   Movie @relation(fields: [movieId], references: [id])
+//   user    User  @relation(fields: [userId], references: [id])
+
+//   @@id([movieId, userId])
+// }
