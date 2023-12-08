@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
+import { CanActivate, ExecutionContext, HttpException, HttpStatus, Injectable, UnauthorizedException } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { JwtService } from "@nestjs/jwt";
 import { RoleTypes, UserPermissions } from "@prisma/client";
@@ -30,7 +30,14 @@ export class JwtGuard implements CanActivate {
       throw new UnauthorizedException()
     }
 
-    const decodedUser = this.jwtService.verify(token, { secret: process.env.JWT_SECRET });
+    let decodedUser;
+
+    try {
+      decodedUser = this.jwtService.verify(token, { secret: process.env.JWT_SECRET });
+    } catch(err) {
+      throw new HttpException('Token expired', HttpStatus.UNAUTHORIZED)
+    }
+
 
     const user = await this.prisma.user.findUnique({
       where: {
@@ -48,6 +55,6 @@ export class JwtGuard implements CanActivate {
       return true
     }
 
-    return requiredPermissions.some((permission) => role.permissions.includes(permission))
+    return requiredPermissions?.some((permission) => role.permissions?.includes(permission))
   }
 }

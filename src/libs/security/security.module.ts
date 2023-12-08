@@ -2,15 +2,11 @@ import { Module } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
 import { SecurityService } from "./security.service";
 import { JwtStrategy } from "./strategies/jwt.strategy";
+import { UsersRepo } from "src/users/repos/users.repo";
 
 @Module({
-  imports: [JwtModule.register({
-    secret: process.env.JWT_SECRET,
-    signOptions: {
-      expiresIn: '10h'
-    }
-  })],
-  providers: [SecurityService, JwtStrategy],
+  imports: [JwtModule.register({})],
+  providers: [SecurityService, JwtStrategy, UsersRepo],
   exports: [SecurityService, JwtModule]
 })
 export class SecurityModule {}

@@ -7,29 +7,33 @@ export class MoviesRepo {
 
   constructor(private prisma: PrismaService) {}
 
-  getAllMovies() {
-    return this.prisma.movie.findMany()
+  async getMovies(skip: number, take: number) {
+    console.log(skip, take)
+    return await this.prisma.movie.findMany({
+      skip,
+      take,
+    })
   }
 
-  getMovieById(id: number) {
-    return this.prisma.movie.findUnique({
+  async getMovieById(id: number) {
+    return await this.prisma.movie.findUnique({
       where: {
         id
       }
     })
   }
 
-  getMoviesByTitle(title: string) {
-    return this.prisma.movie.findMany({
+  async getMoviesByTitle(title: string) {
+    return await this.prisma.movie.findMany({
       where: {
         title
       }
     })
   }
 
-  createMovie(createMovieForm: CreateMovieForm) {
+  async createMovie(createMovieForm: CreateMovieForm) {
     const { title, description, rating, releaseDate, director, cover } = createMovieForm;
-    return this.prisma.movie.create({
+    return await this.prisma.movie.create({
       data: {
         title,
         description,

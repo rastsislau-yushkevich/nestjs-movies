@@ -1,16 +1,20 @@
-import { Body, Controller, Get, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { MoviesRepo } from './repos/movies.repo';
 import { CreateMovieForm } from './domain/create-movie.form';
-import { Request } from 'express';
+import { MoviesService } from './movies.service';
 
 @Controller('movies')
 export class MoviesController {
 
-  constructor(private moviesRepo: MoviesRepo) {}
+  constructor(
+    private moviesService: MoviesService,
+    private moviesRepo: MoviesRepo
+    ) {}
 
+  //page, perPage
   @Get()
-  getMovies() {
-    return this.moviesRepo.getAllMovies()
+  getMovies(@Query('page') page: string, @Query('perPage') perPage: string) {
+    return this.moviesService.getMovies(Number(page), Number(perPage))
   }
 
   @Post('create')
@@ -19,8 +23,8 @@ export class MoviesController {
   }
 
   @Get(':id')
-  getMovieById(@Req() request: Request) {
-    return this.moviesRepo.getMovieById(Number(request.params.id))
+  getMovieById(@Param('id') id: string) {
+    return this.moviesRepo.getMovieById(Number(id))
   }
 
 }
